@@ -38,100 +38,170 @@ h1{margin:0 0 12px;font-size:22px;text-align:center}
   </div>
   <div id="resultArea" style="display:none">
     <div class="final" id="finalMsg"></div>
-  </div>
+  </div><!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>동물 DNA 조합 게임</title>
+<style>
+body {
+  background:#0f172a;
+  color:#fff;
+  font-family:sans-serif;
+  padding:20px;
+}
+h1,h2 { text-align:center; }
+.section {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:20px;
+}
+.card {
+  border:1px solid #475569;
+  padding:10px;
+  cursor:pointer;
+  background:#020617;
+}
+.card.selected {
+  background:#22c55e;
+  color:#000;
+}
+button {
+  margin-top:20px;
+  padding:10px 20px;
+  font-size:16px;
+}
+#result {
+  white-space:pre-line;
+  font-size:18px;
+  margin-top:30px;
+  text-align:center;
+}
+</style>
+</head>
+<body>
+
+<h1>🧬 동물 DNA 조합 게임</h1>
+<h2 id="stepTitle"></h2>
+
+<div id="cards" class="section"></div>
+
+<div style="text-align:center;">
+<button onclick="next()">다음</button>
 </div>
 
+<div id="result"></div>
+
 <script>
-const questions=[
-  {q:'제2차 세계대전 당시, 독일이 병사들의 피로를 줄이고 전투력을 높이기 위해 사용한 각성제의 상표명은 무엇일까?', choices:['히로뽕','페르비틴','아편','메스암페타민','보드카'], answer:1},
-  {q:'다음 중 항생제(antibiotic)의 계열에 속하지 않는 성분은 무엇일까?', choices:['페니실린','세팔로스포린','아미노글리코사이드','비스포스포네이트','퀴놀론'], answer:3},
-  {q:'20세기 초 전 세계적으로 약 5천만 명 이상의 인명 피해를 남긴 전염병의 이름은 무엇일까?', choices:['페스트','코로나19','메로나','에볼라 바이러스','스페인 독감'], answer:4},
-  {q:'나폴레옹의 대륙봉쇄령으로 인해 독일 화학자들이 새로운 합성 의약품을 개발하기 시작했다. 이 시기에 탄생한 대표적인 진통·해열제는?', choices:['모르핀','아스피린','페니실린','퀴닌','스테로이드'], answer:1},
-  {q:'제2차 세계대전 당시, 말라리아 피해가 심각해지자 합성 치료제가 개발되었다. 이때 새롭게 만들어진 약은?', choices:['페니실린','모르핀','클로로퀸(Chloroquine)','아스피린','스피락톤'], answer:2}
-];
+const dna = {
+head: [
+{a:"치타",g:"PAX6",d:"시각 발달"},
+{a:"치타",g:"MITF",d:"눈가 줄무늬"},
+{a:"치타",g:"FOXA2",d:"호흡 발달"},
+{a:"기린",g:"PAX3",d:"감각 구조"},
+{a:"기린",g:"ALX4",d:"두개골 형태"},
+{a:"기린",g:"OTX2",d:"시각계"},
+{a:"펭귄",g:"BMP4",d:"부리 형태"},
+{a:"펭귄",g:"SHH",d:"안면 패턴"},
+{a:"펭귄",g:"PAX6",d:"수중 시야"},
+{a:"문어",g:"PAX6",d:"눈 형성"},
+{a:"문어",g:"PCDH",d:"신경 연결"},
+{a:"문어",g:"ELAVL",d:"신경 안정"}
+],
+body: [
+{a:"치타",g:"MSTN",d:"근육 경량화"},
+{a:"치타",g:"COL1A1",d:"결합조직 탄성"},
+{a:"치타",g:"TTN",d:"근섬유 탄성"},
+{a:"기린",g:"HOXA5",d:"척추 길이"},
+{a:"기린",g:"FGFRL1",d:"혈관 발달"},
+{a:"기린",g:"VEGFA",d:"혈류 증가"},
+{a:"펭귄",g:"UCP1",d:"체온 유지"},
+{a:"펭귄",g:"MYH7",d:"지구력"},
+{a:"펭귄",g:"PPARG",d:"지방 대사"},
+{a:"문어",g:"ADAR",d:"RNA 편집"},
+{a:"문어",g:"SLC6A",d:"신경 전달"},
+{a:"문어",g:"MYH",d:"근육 수축"}
+],
+leg: [
+{a:"치타",g:"ACTN3",d:"속근"},
+{a:"치타",g:"COL5A1",d:"힘줄"},
+{a:"치타",g:"MYH2",d:"빠른 수축"},
+{a:"기린",g:"RUNX2",d:"골형성"},
+{a:"기린",g:"COL1A2",d:"뼈 강도"},
+{a:"기린",g:"IGF1",d:"성장"},
+{a:"펭귄",g:"TBX5",d:"수영 추진"},
+{a:"펭귄",g:"HOXD11",d:"사지 길이"},
+{a:"펭귄",g:"ACTA1",d:"근수축"},
+{a:"문어",g:"Reflectin",d:"위장"},
+{a:"문어",g:"NEUROD",d:"신경 분화"},
+{a:"문어",g:"ACTB",d:"세포골격"}
+]
+};
 
-const perQuestionLimit=5*60*1000; // 5분
-const nextDelay=3000; // 3초
-let current=0,score=0,interval,answered=false;
+let step = 0;
+const order = ["head","body","leg"];
+const chosen = {};
+let selected = [];
 
-const eQ=document.getElementById('questionText'),
-      eC=document.getElementById('choices'),
-      eF=document.getElementById('feedback'),
-      eT=document.getElementById('timeLeft'),
-      eI=document.getElementById('qIndex'),
-      eP=document.getElementById('progressBar'),
-      eA=document.getElementById('quizArea'),
-      eR=document.getElementById('resultArea'),
-      eM=document.getElementById('finalMsg');
+function render() {
+  document.getElementById("stepTitle").innerText =
+    `${["머리","몸통","다리"][step]} DNA 선택 (5개)`;
+  const area = document.getElementById("cards");
+  area.innerHTML = "";
+  selected = [];
 
-function start(){current=0;score=0;showQuestion(current);}
-function showQuestion(idx){
-  answered=false;
-  const q=questions[idx];
-  eI.textContent=idx+1;
-  eQ.textContent=q.q;
-  eF.textContent='';
-  eC.innerHTML='';
-  q.choices.forEach((choice,i)=>{
-    const btn=document.createElement('button');
-    btn.className='choice';
-    btn.type='button';
-    btn.innerHTML=`<strong>${i+1}.</strong> ${choice}`;
-    btn.addEventListener('click',()=>selectAnswer(i,q.answer,btn));
-    eC.appendChild(btn);
-  });
-  startTimer();
-}
-function selectAnswer(sel,answer,btn){
-  if(answered) return;
-  answered=true;
-  clearInterval(interval);
-  Array.from(eC.children).forEach(c=>c.classList.add('disabled'));
-  if(sel===answer){
-    btn.classList.add('correct');
-    eF.textContent='정답입니다!';
-    score++;
-  }else{
-    btn.classList.add('wrong');
-    eF.textContent='틀렸습니다.';
-    eC.children[answer].classList.add('correct');
-  }
-  setTimeout(()=>nextQuestion(),nextDelay);
-}
-function nextQuestion(){
-  current++;
-  if(current>=questions.length) finishQuiz();
-  else showQuestion(current);
-}
-function finishQuiz(){
-  eA.style.display='none';
-  eR.style.display='block';
-  eM.innerHTML=`🎉 수고했습니다!<br>맞힌 문제 수: <strong>${score}</strong> / ${questions.length}`;
-}
-function startTimer(){
-  const start=Date.now();
-  const end=start+perQuestionLimit;
-  interval=setInterval(()=>{
-    const remain=Math.max(0,end-Date.now());
-    const sec=Math.ceil(remain/1000);
-    const min=Math.floor(sec/60);
-    const s=sec%60;
-    eT.textContent=`${min<10?'0'+min:min}:${s<10?'0'+s:s}`;
-    eP.style.width=`${100-(remain/perQuestionLimit*100)}%`;
-    if(remain<=0){
-      clearInterval(interval);
-      if(!answered){
-        answered=true;
-        eF.textContent='시간 초과! 틀렸습니다.';
-        Array.from(eC.children).forEach(c=>c.classList.add('disabled'));
-        setTimeout(nextQuestion,nextDelay);
+  dna[order[step]].forEach(d=>{
+    const c = document.createElement("div");
+    c.className="card";
+    c.innerText = `${d.a}\n${d.g}\n(${d.d})`;
+    c.onclick = ()=>{
+      if (c.classList.contains("selected")) {
+        c.classList.remove("selected");
+        selected = selected.filter(x=>x!==d);
+      } else {
+        if (selected.length>=5) return;
+        c.classList.add("selected");
+        selected.push(d);
       }
-    }
-  },200);
+    };
+    area.appendChild(c);
+  });
 }
 
-start();
+function decide(arr) {
+  const cnt = {};
+  arr.forEach(d=>cnt[d.a]=(cnt[d.a]||0)+1);
+  const max = Math.max(...Object.values(cnt));
+  const top = Object.keys(cnt).filter(k=>cnt[k]===max);
+  return top[Math.floor(Math.random()*top.length)];
+}
+
+function next() {
+  if (selected.length!==5) {
+    alert("5개를 선택하세요");
+    return;
+  }
+  chosen[order[step]] = decide(selected);
+  step++;
+  if (step<3) render();
+  else showResult();
+}
+
+function showResult() {
+  document.getElementById("cards").innerHTML="";
+  document.getElementById("stepTitle").innerText="🎉 최종 결과";
+  document.getElementById("result").innerText =
+`🧠 머리: ${chosen.head}
+🫀 몸통: ${chosen.body}
+🦵 다리: ${chosen.leg}
+
+완성된 혼합 생물 탄생!`;
+}
+
+render();
 </script>
+
 </body>
 </html>
-# ---
+
