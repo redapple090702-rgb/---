@@ -1,44 +1,4 @@
-<!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>역사·의학 퀴즈</title>
-<style>
-body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f4f6fb;margin:0;font-family:'Noto Sans KR',sans-serif}
-.card{width:720px;max-width:95%;background:#fff;padding:24px;border-radius:12px;box-shadow:0 8px 30px rgba(20,30,60,0.08)}
-h1{margin:0 0 12px;font-size:22px;text-align:center}
-.question{font-size:18px;margin:18px 0}
-.choices{display:flex;flex-direction:column;gap:10px}
-.choice{padding:12px 14px;border-radius:8px;border:1px solid #d6dce9;background:#fcfdff;cursor:pointer;text-align:left;transition:0.2s}
-.choice:hover{background:#eef3ff}
-.choice.disabled{opacity:0.6;pointer-events:none}
-.choice.correct{border-color:#2e8b57;background:#e8fbf0}
-.choice.wrong{border-color:#d9534f;background:#fff0f0}
-.feedback{height:28px;margin-top:12px;font-weight:600;text-align:center}
-.progress{height:8px;background:#eef3ff;border-radius:999px;overflow:hidden;margin-top:10px}
-.progress > i{display:block;height:100%;background:#4b7cff;width:0%}
-.footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:#444}
-.timer{font-weight:700}
-.final{font-size:18px;text-align:center;padding:18px}
-</style>
-</head>
-<body>
-<div class="card">
-  <h1>역사·의학 퀴즈</h1>
-  <div id="quizArea">
-    <div class="question" id="questionText">로딩 중...</div>
-    <div class="choices" id="choices"></div>
-    <div class="feedback" id="feedback"></div>
-    <div class="progress"><i id="progressBar"></i></div>
-    <div class="footer">
-      <div class="timer">남은 시간: <span id="timeLeft">--:--</span></div>
-      <div class="small">문제: <span id="qIndex">0</span>/5</div>
-    </div>
-  </div>
-  <div id="resultArea" style="display:none">
-    <div class="final" id="finalMsg"></div>
-  </div><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -204,4 +164,3 @@ render();
 
 </body>
 </html>
-
