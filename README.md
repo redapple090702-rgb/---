@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>DNA 특성 선택 게임</title>
+<title>DNA 조합 게임</title>
 <style>
 body {
   background:#020617;
@@ -39,6 +39,7 @@ button {
   margin-top:30px;
   text-align:center;
 }
+.center { text-align:center; }
 </style>
 </head>
 <body>
@@ -48,37 +49,37 @@ button {
 
 <div id="cards" class="section"></div>
 
-<div style="text-align:center;">
-<button onclick="nextStep()">다음</button>
+<div class="center">
+  <button id="nextBtn" onclick="nextStep()">다음</button>
 </div>
 
-<div id="result"></div>
+<div id="result" class="center"></div>
 
 <script>
 const dna = {
 head: [
 {animal:"치타", gene:"PAX6", desc:"시각 기능 강화"},
-{animal:"치타", gene:"MITF", desc:"눈 주변 색 대비"},
+{animal:"치타", gene:"MITF", desc:"눈 색 대비"},
 {animal:"치타", gene:"FOXA2", desc:"호흡기 발달"},
-{animal:"기린", gene:"PAX3", desc:"감각 구조 형성"},
+{animal:"기린", gene:"PAX3", desc:"감각 구조"},
 {animal:"기린", gene:"ALX4", desc:"두개골 형태"},
 {animal:"기린", gene:"OTX2", desc:"시각계 발달"},
 {animal:"펭귄", gene:"BMP4", desc:"부리 형태"},
-{animal:"펭귄", gene:"SHH", desc:"안면 구조 패턴"},
+{animal:"펭귄", gene:"SHH", desc:"안면 구조"},
 {animal:"펭귄", gene:"PAX6", desc:"수중 시야"},
 {animal:"문어", gene:"PAX6", desc:"눈 형성"},
-{animal:"문어", gene:"PCDH", desc:"신경 연결 다양화"},
-{animal:"문어", gene:"ELAVL", desc:"신경 안정성"}
+{animal:"문어", gene:"PCDH", desc:"신경 연결"},
+{animal:"문어", gene:"ELAVL", desc:"신경 안정"}
 ],
 body: [
 {animal:"치타", gene:"MSTN", desc:"근육 경량화"},
-{animal:"치타", gene:"COL1A1", desc:"결합조직 탄성"},
+{animal:"치타", gene:"COL1A1", desc:"조직 탄성"},
 {animal:"치타", gene:"TTN", desc:"근섬유 탄성"},
-{animal:"기린", gene:"HOXA5", desc:"척추 길이 증가"},
+{animal:"기린", gene:"HOXA5", desc:"척추 길이"},
 {animal:"기린", gene:"FGFRL1", desc:"혈관 발달"},
 {animal:"기린", gene:"VEGFA", desc:"혈류 효율"},
 {animal:"펭귄", gene:"UCP1", desc:"체온 유지"},
-{animal:"펭귄", gene:"MYH7", desc:"지구력 근육"},
+{animal:"펭귄", gene:"MYH7", desc:"지구력"},
 {animal:"펭귄", gene:"PPARG", desc:"지방 대사"},
 {animal:"문어", gene:"ADAR", desc:"RNA 편집"},
 {animal:"문어", gene:"SLC6A", desc:"신경 전달"},
@@ -87,14 +88,14 @@ body: [
 leg: [
 {animal:"치타", gene:"ACTN3", desc:"속근 기능"},
 {animal:"치타", gene:"COL5A1", desc:"힘줄 강도"},
-{animal:"치타", gene:"MYH2", desc:"빠른 근수축"},
+{animal:"치타", gene:"MYH2", desc:"빠른 수축"},
 {animal:"기린", gene:"RUNX2", desc:"골형성"},
 {animal:"기린", gene:"COL1A2", desc:"뼈 강도"},
 {animal:"기린", gene:"IGF1", desc:"성장 조절"},
 {animal:"펭귄", gene:"TBX5", desc:"수영 추진"},
 {animal:"펭귄", gene:"HOXD11", desc:"사지 길이"},
 {animal:"펭귄", gene:"ACTA1", desc:"근수축"},
-{animal:"문어", gene:"Reflectin", desc:"위장 능력"},
+{animal:"문어", gene:"Reflectin", desc:"위장"},
 {animal:"문어", gene:"NEUROD", desc:"신경 분화"},
 {animal:"문어", gene:"ACTB", desc:"세포골격"}
 ]
@@ -111,6 +112,7 @@ function shuffle(arr) {
 }
 
 function render() {
+  document.getElementById("result").innerText = "";
   document.getElementById("stepTitle").innerText =
     `${labels[step]} DNA 선택 (5개)`;
 
@@ -137,10 +139,10 @@ function render() {
 }
 
 function decide(arr) {
-  const count = {};
-  arr.forEach(d=>count[d.animal]=(count[d.animal]||0)+1);
-  const max = Math.max(...Object.values(count));
-  const top = Object.keys(count).filter(k=>count[k]===max);
+  const cnt = {};
+  arr.forEach(d=>cnt[d.animal]=(cnt[d.animal]||0)+1);
+  const max = Math.max(...Object.values(cnt));
+  const top = Object.keys(cnt).filter(k=>cnt[k]===max);
   return top[Math.floor(Math.random()*top.length)];
 }
 
@@ -162,6 +164,18 @@ function showResult() {
 `🧠 머리: ${result.head}
 🫀 몸통: ${result.body}
 🦵 다리: ${result.leg}`;
+
+  document.getElementById("nextBtn").innerText = "다시 하기";
+  document.getElementById("nextBtn").onclick = restart;
+}
+
+function restart() {
+  step = 0;
+  selected = [];
+  for (let k in result) delete result[k];
+  document.getElementById("nextBtn").innerText = "다음";
+  document.getElementById("nextBtn").onclick = nextStep;
+  render();
 }
 
 render();
@@ -169,3 +183,4 @@ render();
 
 </body>
 </html>
+
