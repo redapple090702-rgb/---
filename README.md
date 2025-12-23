@@ -2,154 +2,155 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>고혈압 통합 관리</title>
-
+<title>고혈압 관리 프로그램</title>
 <style>
+:root {
+  --font-size: 18px;
+}
+
 body {
-  background:#020617;
-  color:#fff;
-  font-family:sans-serif;
-  padding:20px;
-  font-size:18px;
-  transition:0.2s;
+  font-family: "맑은 고딕", sans-serif;
+  font-size: var(--font-size);
+  margin: 20px;
 }
-
-/* ✅ 큰 글씨 모드 */
-body.big {
-  font-size:30px;
-}
-
-h1,h2 { text-align:center; }
 
 button {
-  padding:14px;
-  margin:8px;
-  font-size:1.2em;
-  cursor:pointer;
+  font-size: var(--font-size);
+  margin: 5px;
+  padding: 10px;
 }
 
 input {
-  font-size:1.2em;
-  padding:6px;
-  margin:6px;
+  font-size: var(--font-size);
+  padding: 5px;
 }
 
-.card {
-  border:1px solid #475569;
-  padding:16px;
-  margin-top:16px;
+.hidden {
+  display: none;
 }
-.correct { color:#22c55e; }
-.wrong { color:#ef4444; }
+
 </style>
 </head>
-
 <body>
 
-<h1>🩺 고혈압 통합 관리 프로그램</h1>
+<h1>고혈압 건강 관리 프로그램</h1>
 
-<div class="card" style="text-align:center">
-  <button onclick="showBP()">혈압 측정</button>
-  <button onclick="showQuiz()">고혈압 퀴즈</button>
-  <button onclick="toggleBig()">큰 글씨 모드</button>
+<div id="main">
+  <button onclick="show('measure')">혈압 측정기</button>
+  <button onclick="startQuiz()">고혈압 퀴즈</button>
+  <button onclick="toggleFont()">큰 글씨 모드</button>
 </div>
 
-<div id="content"></div>
+<!-- 측정기 -->
+<div id="measure" class="hidden">
+  <h2>혈압 측정</h2>
+  <p>수축기(mmHg)</p>
+  <input id="sys" type="number">
+  <p>이완기(mmHg)</p>
+  <input id="dia" type="number">
+  <br><br>
+  <button onclick="checkBP()">결과 확인</button>
+  <p id="bpResult"></p>
+  <button onclick="goHospital()">병원 정보 보기</button>
+  <br><br>
+  <button onclick="back()">뒤로가기</button>
+</div>
+
+<!-- 퀴즈 -->
+<div id="quiz" class="hidden">
+  <h2>O / X 퀴즈</h2>
+  <form id="quizForm"></form>
+  <button onclick="gradeQuiz()">채점하기</button>
+  <p id="quizResult"></p>
+  <button onclick="back()">뒤로가기</button>
+</div>
 
 <script>
-/* ================= 공통 ================= */
-function toggleBig(){
-  document.body.classList.toggle("big");
+let big = false;
+
+function toggleFont() {
+  big = !big;
+  document.documentElement.style.setProperty(
+    "--font-size", big ? "28px" : "18px"
+  );
 }
 
-/* ================= 혈압 ================= */
-function classify(sp, dp){
-  if(sp>=180||dp>=120) return "고혈압 위기";
-  if(sp>=160||dp>=100) return "2기 고혈압";
-  if(sp>=140||dp>=90) return "1기 고혈압";
-  if(sp>=120||dp>=80) return "고혈압 전단계";
-  return "정상 혈압";
+function show(id) {
+  document.querySelectorAll("div").forEach(d => d.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
 }
 
-function showBP(){
-  document.getElementById("content").innerHTML = `
-  <div class="card">
-    <h2>혈압 측정</h2>
-    수축기(mmHg) <input id="sp" type="number"><br>
-    확장기(mmHg) <input id="dp" type="number"><br><br>
-    <button onclick="calcBP()">측정하기</button>
-    <div id="bpResult"></div>
-  </div>`;
+function back() {
+  show("main");
 }
 
-function calcBP(){
-  const sp = Number(document.getElementById("sp").value);
-  const dp = Number(document.getElementById("dp").value);
+function checkBP() {
+  const s = Number(sys.value);
+  const d = Number(dia.value);
+  let result = "";
 
-  if(!sp || !dp){
-    alert("숫자를 입력하세요");
-    return;
+  if (!s || !d) {
+    result = "숫자를 입력하세요.";
+  } else if (s >= 140 || d >= 90) {
+    result = "⚠ 고혈압입니다. 병원 진료를 권장합니다.";
+  } else if (s >= 120 || d >= 80) {
+    result = "⚠ 고혈압 전단계입니다.";
+  } else {
+    result = "✅ 정상 혈압입니다.";
   }
 
-  const r = classify(sp,dp);
-
-  /* 결과 저장 */
-  const log = JSON.parse(localStorage.getItem("bpLog") || "[]");
-  log.push({date:new Date().toLocaleString(), sp, dp, r});
-  localStorage.setItem("bpLog", JSON.stringify(log));
-
-  document.getElementById("bpResult").innerHTML = `
-    <p><b>판정:</b> ${r}</p>
-    <p>결과가 저장되었습니다.</p>
-    ${r!=="정상 혈압"
-      ? `<a href="https://www.kdca.go.kr" target="_blank">의료 정보 보기</a>`
-      : ""}`;
+  bpResult.textContent = result;
+  localStorage.setItem("bpResult", `${s}/${d} → ${result}`);
 }
 
-/* ================= 퀴즈 ================= */
-const QUIZ = [
-["혈압약은 의사 지시 없이 중단하면 안 된다",true,"갑작스러운 중단은 위험합니다."],
-["고혈압은 증상이 없어도 위험하다",true,"장기 손상이 진행될 수 있습니다."],
-["저염식은 혈압 관리에 도움 된다",true,"나트륨 섭취를 줄이세요."],
-["혈압은 한 번만 재면 충분하다",false,"여러 번 재야 정확합니다."],
-["운동은 혈압을 낮출 수 있다",true,"걷기 같은 유산소 운동이 좋습니다."],
-["흡연은 혈압에 영향이 없다",false,"혈관을 수축시킵니다."],
-["스트레스 관리도 중요하다",true,"혈압 상승 요인입니다."]
+function goHospital() {
+  window.open("https://www.nhis.or.kr", "_blank");
+}
+
+/* ===== 퀴즈 ===== */
+const QUESTIONS = [
+ ["고혈압은 대부분 증상이 없다", true, "침묵의 살인자라 불립니다."],
+ ["짠 음식은 혈압을 낮춘다", false, "나트륨은 혈압을 올립니다."],
+ ["운동은 혈압 조절에 도움 된다", true, "유산소 운동이 효과적입니다."],
+ ["혈압약은 임의로 중단해도 된다", false, "위험합니다."],
+ ["고혈압은 뇌졸중 위험을 높인다", true, "주요 원인입니다."],
+ ["나이가 들수록 위험이 증가한다", true, "혈관 탄력 감소 때문입니다."],
+ ["카페인은 혈압과 무관하다", false, "일시적 상승 가능"]
 ];
 
-let currentQuiz = [];
+let quizSet = [];
 
-function showQuiz(){
-  currentQuiz = QUIZ.sort(()=>Math.random()-0.5).slice(0,6);
-  let html = `<div class="card"><h2>O / X 퀴즈</h2>`;
-  currentQuiz.forEach((q,i)=>{
-    html += `
-    <p>${i+1}. ${q[0]}</p>
-    <label><input type="radio" name="q${i}" value="true"> O</label>
-    <label><input type="radio" name="q${i}" value="false"> X</label>`;
+function startQuiz() {
+  show("quiz");
+  quizForm.innerHTML = "";
+  quizSet = QUESTIONS.sort(() => 0.5 - Math.random()).slice(0, 6);
+
+  quizSet.forEach((q, i) => {
+    quizForm.innerHTML += `
+      <p>${q[0]}</p>
+      <label><input type="radio" name="q${i}" value="true"> O</label>
+      <label><input type="radio" name="q${i}" value="false"> X</label>
+    `;
   });
-  html += `<br><br><button onclick="grade()">채점</button></div>`;
-  document.getElementById("content").innerHTML = html;
 }
 
-function grade(){
+function gradeQuiz() {
   let score = 0;
-  let html = `<div class="card"><h2>퀴즈 결과</h2>`;
-  currentQuiz.forEach((q,i)=>{
-    const sel = document.querySelector(`input[name="q${i}"]:checked`);
-    const ok = sel && (sel.value==="true")===q[1];
-    if(ok) score++;
-    html += `
-    <p class="${ok?'correct':'wrong'}">
-      ${i+1}. ${ok?'정답':'오답'}
-      <button onclick="alert('${q[2]}')">설명</button>
-    </p>`;
+  let explain = "";
+
+  quizSet.forEach((q, i) => {
+    const user = document.querySelector(`input[name="q${i}"]:checked`);
+    if (user && (user.value === String(q[1]))) score++;
+    explain += `${q[0]}\n정답: ${q[1] ? "O" : "X"}\n설명: ${q[2]}\n\n`;
   });
-  html += `<h3>점수: ${score}/${currentQuiz.length}</h3></div>`;
-  document.getElementById("content").innerHTML = html;
+
+  quizResult.textContent = `점수: ${score} / 6`;
+  alert(explain);
+  localStorage.setItem("quizScore", score);
 }
 </script>
 
 </body>
 </html>
+
 
