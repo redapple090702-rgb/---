@@ -1,185 +1,180 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<title>DNA 조합 게임</title>
-<style>
-body {
-  background:#020617;
-  color:#fff;
-  font-family:sans-serif;
-  padding:20px;
-}
-h1,h2 { text-align:center; }
-.section {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-top:20px;
-}
-.card {
-  border:1px solid #475569;
-  padding:12px;
-  cursor:pointer;
-  background:#020617;
-}
-.card.selected {
-  background:#22c55e;
-  color:#000;
-}
-button {
-  margin-top:20px;
-  padding:10px 20px;
-  font-size:16px;
-  cursor:pointer;
-}
-#result {
-  white-space:pre-line;
-  font-size:18px;
-  margin-top:30px;
-  text-align:center;
-}
-.center { text-align:center; }
-</style>
-</head>
-<body>
+import random
+import webbrowser
 
-<h1>🧬 DNA 특성 조합 게임</h1>
-<h2 id="stepTitle"></h2>
+# =================================
+# 혈압 분석 함수
+# =================================
 
-<div id="cards" class="section"></div>
+def classify_blood_pressure(sp, dp):
+    if sp >= 180 or dp >= 120:
+        return "고혈압 위기 (응급 상황)"
+    elif sp >= 160 or dp >= 100:
+        return "2기 고혈압"
+    elif sp >= 140 or dp >= 90:
+        return "1기 고혈압"
+    elif 120 <= sp <= 139 or 80 <= dp <= 89:
+        return "고혈압 전단계"
+    elif sp < 120 and dp < 80:
+        return "정상 혈압"
+    else:
+        return "측정값 확인 필요"
 
-<div class="center">
-  <button id="nextBtn" onclick="nextStep()">다음</button>
-</div>
+def calculate_pp(sp, dp):
+    return sp - dp
 
-<div id="result" class="center"></div>
+def calculate_map(sp, dp):
+    return ((2 * dp) + sp) / 3
 
-<script>
-const dna = {
-head: [
-{animal:"치타", gene:"PAX6", desc:"시각 기능 강화"},
-{animal:"치타", gene:"MITF", desc:"눈 색 대비"},
-{animal:"치타", gene:"FOXA2", desc:"호흡기 발달"},
-{animal:"기린", gene:"PAX3", desc:"감각 구조"},
-{animal:"기린", gene:"ALX4", desc:"두개골 형태"},
-{animal:"기린", gene:"OTX2", desc:"시각계 발달"},
-{animal:"펭귄", gene:"BMP4", desc:"부리 형태"},
-{animal:"펭귄", gene:"SHH", desc:"안면 구조"},
-{animal:"펭귄", gene:"PAX6", desc:"수중 시야"},
-{animal:"문어", gene:"PAX6", desc:"눈 형성"},
-{animal:"문어", gene:"PCDH", desc:"신경 연결"},
-{animal:"문어", gene:"ELAVL", desc:"신경 안정"}
-],
-body: [
-{animal:"치타", gene:"MSTN", desc:"근육 경량화"},
-{animal:"치타", gene:"COL1A1", desc:"조직 탄성"},
-{animal:"치타", gene:"TTN", desc:"근섬유 탄성"},
-{animal:"기린", gene:"HOXA5", desc:"척추 길이"},
-{animal:"기린", gene:"FGFRL1", desc:"혈관 발달"},
-{animal:"기린", gene:"VEGFA", desc:"혈류 효율"},
-{animal:"펭귄", gene:"UCP1", desc:"체온 유지"},
-{animal:"펭귄", gene:"MYH7", desc:"지구력"},
-{animal:"펭귄", gene:"PPARG", desc:"지방 대사"},
-{animal:"문어", gene:"ADAR", desc:"RNA 편집"},
-{animal:"문어", gene:"SLC6A", desc:"신경 전달"},
-{animal:"문어", gene:"MYH", desc:"근육 수축"}
-],
-leg: [
-{animal:"치타", gene:"ACTN3", desc:"속근 기능"},
-{animal:"치타", gene:"COL5A1", desc:"힘줄 강도"},
-{animal:"치타", gene:"MYH2", desc:"빠른 수축"},
-{animal:"기린", gene:"RUNX2", desc:"골형성"},
-{animal:"기린", gene:"COL1A2", desc:"뼈 강도"},
-{animal:"기린", gene:"IGF1", desc:"성장 조절"},
-{animal:"펭귄", gene:"TBX5", desc:"수영 추진"},
-{animal:"펭귄", gene:"HOXD11", desc:"사지 길이"},
-{animal:"펭귄", gene:"ACTA1", desc:"근수축"},
-{animal:"문어", gene:"Reflectin", desc:"위장"},
-{animal:"문어", gene:"NEUROD", desc:"신경 분화"},
-{animal:"문어", gene:"ACTB", desc:"세포골격"}
-]
-};
+# =================================
+# 혈압 측정 프로그램
+# =================================
 
-const order = ["head","body","leg"];
-const labels = ["머리","몸통","다리"];
-let step = 0;
-let selected = [];
-const result = {};
+def blood_pressure_program():
+    while True:
+        try:
+            sp = float(input("\n수축기 혈압(SP)을 입력하세요: "))
+            dp = float(input("확장기 혈압(DP)을 입력하세요: "))
 
-function shuffle(arr) {
-  return arr.sort(()=>Math.random()-0.5);
-}
+            result = classify_blood_pressure(sp, dp)
+            pp = calculate_pp(sp, dp)
+            map_val = calculate_map(sp, dp)
 
-function render() {
-  document.getElementById("result").innerText = "";
-  document.getElementById("stepTitle").innerText =
-    `${labels[step]} DNA 선택 (5개)`;
+            print("\n====== 혈압 분석 결과 ======")
+            print(f"수축기 혈압: {sp:.1f} mmHg")
+            print(f"확장기 혈압: {dp:.1f} mmHg")
+            print(f"맥압(PP): {pp:.1f} mmHg")
+            print(f"평균동맥압(MAP): {map_val:.1f} mmHg")
+            print(f"▶ 판정 결과: {result}")
 
-  selected = [];
-  const area = document.getElementById("cards");
-  area.innerHTML = "";
+            # 결과별 행동 가이드 + 사이트 연동
+            if result == "정상 혈압":
+                print("✅ 정상입니다. 현재 생활습관을 유지하세요.")
 
-  shuffle([...dna[order[step]]]).forEach(d=>{
-    const card = document.createElement("div");
-    card.className="card";
-    card.innerText = `${d.gene}\n${d.desc}`;
-    card.onclick = ()=>{
-      if (card.classList.contains("selected")) {
-        card.classList.remove("selected");
-        selected = selected.filter(x=>x!==d);
-      } else {
-        if (selected.length>=5) return;
-        card.classList.add("selected");
-        selected.push(d);
-      }
-    };
-    area.appendChild(card);
-  });
+            elif "전단계" in result:
+                print("⚠️ 생활습관 개선이 필요합니다.")
+                if input("고혈압 예방 정보를 확인할까요? (Y/N): ").upper() == "Y":
+                    webbrowser.open("https://www.kdca.go.kr")
+
+            elif "1기" in result:
+                print("⚠️ 고혈압입니다. 지속적인 관리가 필요합니다.")
+                if input("고혈압 관리 정보를 확인할까요? (Y/N): ").upper() == "Y":
+                    webbrowser.open("https://www.nhis.or.kr")
+
+            elif "2기" in result:
+                print("❗ 고혈압이 심한 상태입니다.")
+                if input("병원 예약 사이트로 이동할까요? (Y/N): ").upper() == "Y":
+                    webbrowser.open("https://www.goodoc.co.kr")
+
+            elif "위기" in result:
+                print("🚨 응급 상황입니다! 즉시 병원 방문이 필요합니다.")
+                if input("병원 정보를 바로 확인할까요? (Y/N): ").upper() == "Y":
+                    webbrowser.open("https://www.goodoc.co.kr")
+
+        except ValueError:
+            print("⚠️ 숫자를 정확히 입력해주세요.")
+            continue
+
+        if input("\n메인 화면으로 돌아가려면 M 입력: ").upper() == "M":
+            break
+
+# =================================
+# 퀴즈 데이터 (난이도 혼합)
+# =================================
+
+quiz = {
+    "상황 대응 · 행동 판단": [
+        ("혈압이 180/120mmHg 이상이면 즉시 병원에 가야 한다.", True),
+        ("증상이 없으면 고혈압 관리를 하지 않아도 된다.", False),
+        ("혈압 측정 전에는 잠시 앉아서 안정을 취하는 것이 좋다.", True),
+        ("두통과 어지럼증이 심하면 혈압을 확인해볼 필요가 있다.", True),
+        ("혈압이 한 번 높게 나왔다고 바로 고혈압은 아니다.", True),
+        ("고혈압과 함께 가슴 통증이 있으면 응급 상황일 수 있다.", True),
+        ("혈압이 높을 때 바로 격한 운동을 시작하는 것이 좋다.", False),
+        ("집에서 측정한 혈압 기록은 병원 진료에 도움이 된다.", True),
+    ],
+
+    "생활습관 · 관리": [
+        ("염분 섭취를 줄이면 혈압 관리에 도움이 된다.", True),
+        ("규칙적인 걷기 운동은 혈압 조절에 도움이 된다.", True),
+        ("혈압약은 증상이 있을 때만 복용하면 된다.", False),
+        ("과도한 음주는 혈압을 상승시킬 수 있다.", True),
+        ("체중 감량은 혈압을 낮추는 데 도움이 될 수 있다.", True),
+        ("스트레스 관리는 혈압과 무관하다.", False),
+        ("금연은 고혈압 합병증 위험을 낮춘다.", True),
+        ("수면 부족은 혈압과 관련이 없다.", False),
+    ],
+
+    "원리 · 의학적 이해": [
+        ("고혈압은 심장과 혈관에 지속적인 부담을 준다.", True),
+        ("혈압은 심박출량과 말초혈관 저항의 영향을 받는다.", True),
+        ("맥압이 크다는 것은 혈관 탄성이 감소했을 가능성을 의미한다.", True),
+        ("고혈압은 뇌졸중 위험을 증가시킨다.", True),
+        ("평균동맥압은 장기 관류 상태 판단에 사용된다.", True),
+        ("혈압이 정상으로 돌아오면 고혈압은 완치된 것이다.", False),
+        ("고혈압은 신장 기능에도 영향을 줄 수 있다.", True),
+        ("고혈압 관리는 단기간만 하면 충분하다.", False),
+    ]
 }
 
-function decide(arr) {
-  const cnt = {};
-  arr.forEach(d=>cnt[d.animal]=(cnt[d.animal]||0)+1);
-  const max = Math.max(...Object.values(cnt));
-  const top = Object.keys(cnt).filter(k=>cnt[k]===max);
-  return top[Math.floor(Math.random()*top.length)];
-}
+def quiz_program():
+    score = 0
+    total = 0
 
-function nextStep() {
-  if (selected.length!==5) {
-    alert("5개를 선택하세요");
-    return;
-  }
-  result[order[step]] = decide(selected);
-  step++;
-  if (step<3) render();
-  else showResult();
-}
+    print("\n⚠️ 퀴즈 중 M 입력 시 메인 화면으로 돌아갑니다.")
 
-function showResult() {
-  document.getElementById("cards").innerHTML="";
-  document.getElementById("stepTitle").innerText="🎉 최종 결과";
-  document.getElementById("result").innerText =
-`🧠 머리: ${result.head}
-🫀 몸통: ${result.body}
-🦵 다리: ${result.leg}`;
+    for part, questions in quiz.items():
+        print(f"\n[{part}]")
+        random.shuffle(questions)
 
-  document.getElementById("nextBtn").innerText = "다시 하기";
-  document.getElementById("nextBtn").onclick = restart;
-}
+        for q, answer in questions:
+            user = input(f"{q} (O/X): ").upper()
 
-function restart() {
-  step = 0;
-  selected = [];
-  for (let k in result) delete result[k];
-  document.getElementById("nextBtn").innerText = "다음";
-  document.getElementById("nextBtn").onclick = nextStep;
-  render();
-}
+            if user == "M":
+                print("\n메인 화면으로 이동합니다.")
+                return
 
-render();
-</script>
+            if user not in ["O", "X"]:
+                print("⚠️ O 또는 X만 입력하세요.")
+                continue
+
+            total += 1
+            if (user == "O" and answer) or (user == "X" and not answer):
+                print("⭕ 정답")
+                score += 1
+            else:
+                print("❌ 오답")
+
+    print("\n====== 퀴즈 결과 ======")
+    print(f"총 점수: {score} / {total}")
+
+# =================================
+# 메인 메뉴
+# =================================
+
+def main():
+    while True:
+        print("\n======================")
+        print("고혈압 통합 관리 프로그램")
+        print("1. 혈압 측정기")
+        print("2. 고혈압 퀴즈")
+        print("3. 종료")
+        print("======================")
+
+        choice = input("번호를 선택하세요: ")
+
+        if choice == "1":
+            blood_pressure_program()
+        elif choice == "2":
+            quiz_program()
+        elif choice == "3":
+            print("프로그램을 종료합니다.")
+            break
+        else:
+            print("⚠️ 올바른 번호를 입력하세요.")
+
+# 실행
+main()
+
 
 </body>
 </html>
