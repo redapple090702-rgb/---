@@ -2,40 +2,40 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>고혈압 통합 관리</title>
+<title>고혈압 통합 관리 프로그램</title>
 
 <style>
-body {
+body{
   background:#020617;
-  color:#fff;
+  color:#ffffff;
   font-family:sans-serif;
   padding:20px;
   font-size:18px;
 }
 
-h1,h2 { text-align:center; }
+h1,h2{text-align:center;}
 
-button {
-  padding:14px;
+button{
+  padding:12px 18px;
   margin:8px;
-  font-size:1.1em;
+  font-size:1em;
   cursor:pointer;
 }
 
-input {
-  font-size:1.1em;
+input{
   padding:6px;
+  font-size:1em;
   margin:6px;
 }
 
-.card {
+.card{
   border:1px solid #475569;
   padding:16px;
   margin-top:16px;
 }
 
-.correct { color:#22c55e; }
-.wrong { color:#ef4444; }
+.correct{color:#22c55e;}
+.wrong{color:#ef4444;}
 </style>
 </head>
 
@@ -51,12 +51,12 @@ input {
 <div id="content"></div>
 
 <script>
-/* ================= 혈압 ================= */
+/* ================= 혈압 측정 ================= */
 function classify(sp, dp){
-  if(sp>=180||dp>=120) return "고혈압 위기";
-  if(sp>=160||dp>=100) return "2기 고혈압";
-  if(sp>=140||dp>=90) return "1기 고혈압";
-  if(sp>=120||dp>=80) return "고혈압 전단계";
+  if(sp>=180 || dp>=120) return "고혈압 위기";
+  if(sp>=160 || dp>=100) return "2기 고혈압";
+  if(sp>=140 || dp>=90)  return "1기 고혈압";
+  if(sp>=120 || dp>=80)  return "고혈압 전단계";
   return "정상 혈압";
 }
 
@@ -80,80 +80,86 @@ function calcBP(){
     return;
   }
 
-  const r = classify(sp,dp);
+  const result = classify(sp,dp);
 
   document.getElementById("bpResult").innerHTML = `
-    <p><b>판정:</b> ${r}</p>
-    ${r!=="정상 혈압"
-      ? `<a href="https://www.kdca.go.kr" target="_blank">질병관리청 고혈압 정보 보기</a>`
-      : ""}`;
+    <p><b>판정:</b> ${result}</p>
+    ${result!=="정상 혈압"
+      ? `<a href="https://www.kdca.go.kr" target="_blank">질병관리청 의료 정보 보기</a>`
+      : ""}
+  `;
 }
 
-/* ================= 퀴즈 ================= */
-/* 총 30문제 */
+/* ================= 퀴즈 (30문제) ================= */
 const QUIZ = [
-["고혈압은 장기간 방치하면 신장 기능을 저하시킬 수 있다",true,"고혈압은 신장 혈관을 손상시킵니다."],
-["혈압은 측정할 때 다리를 꼬아도 된다",false,"다리를 꼬면 혈압이 높게 나올 수 있습니다."],
-["고혈압은 심부전 발생 위험을 증가시킨다",true,"심장이 과도한 압력을 받습니다."],
-["아침 고혈압은 심혈관 질환 위험이 높다",true,"아침 혈압 상승이 특히 위험합니다."],
-["혈압약은 증상이 있을 때만 복용한다",false,"증상이 없어도 꾸준히 복용해야 합니다."],
-["짠 음식을 먹으면 체내 수분량이 증가한다",true,"나트륨은 수분을 붙잡습니다."],
-["고혈압은 뇌출혈 위험을 증가시킨다",true,"혈관 파열 위험이 커집니다."],
-["운동 직후 혈압을 재면 정확하다",false,"안정 후 측정해야 합니다."],
-["고혈압은 동맥경화를 촉진한다",true,"혈관 벽 손상을 유발합니다."],
-["칼륨 섭취는 혈압 조절에 도움을 준다",true,"나트륨 배출을 촉진합니다."],
+["고혈압은 증상이 없어도 위험하다",true,"자각 증상이 없어도 장기 손상이 진행됩니다."],
+["혈압약은 증상이 없으면 중단해도 된다",false,"의사 지시 없이 중단하면 위험합니다."],
+["짠 음식은 혈압을 상승시킨다",true,"나트륨은 혈압 상승의 주요 원인입니다."],
+["운동은 고혈압 치료에 도움이 된다",true,"유산소 운동이 혈압을 낮춥니다."],
+["흡연은 혈압과 무관하다",false,"흡연은 혈관을 수축시킵니다."],
+["스트레스는 혈압에 영향을 준다",true,"스트레스 호르몬이 혈압을 올립니다."],
+["혈압은 아침과 저녁에 차이가 없다",false,"시간대에 따라 혈압은 달라집니다."],
+["고혈압은 뇌졸중 위험을 높인다",true,"혈관 손상으로 뇌졸중 위험이 증가합니다."],
+["비만은 고혈압의 위험 요인이다",true,"체중 증가가 혈압을 올립니다."],
+["커피는 혈압에 아무 영향이 없다",false,"카페인은 일시적으로 혈압을 올릴 수 있습니다."],
 
-["스트레스는 혈압 상승 요인이다",true,"교감신경이 활성화됩니다."],
-["혈압은 겨울보다 여름에 더 높다",false,"추운 계절에 혈압이 더 높습니다."],
-["고혈압은 시력 저하를 유발할 수 있다",true,"망막 혈관 손상 때문입니다."],
-["체중 감소는 혈압을 낮출 수 있다",true,"비만은 주요 위험 요인입니다."],
-["술은 소량이라도 혈압에 영향이 없다",false,"알코올은 혈압을 상승시킵니다."],
-["고혈압은 가족력이 중요하다",true,"유전적 요인이 큽니다."],
-["혈압 측정 전 5분 휴식이 필요하다",true,"안정 상태가 중요합니다."],
-["고혈압은 심근경색 위험을 낮춘다",false,"오히려 위험을 증가시킵니다."],
-["식이섬유는 혈압 관리에 도움된다",true,"혈관 건강을 개선합니다."],
-["고혈압 전단계는 치료가 필요 없다",false,"생활습관 관리가 필요합니다."],
+["고혈압은 심장병 위험을 높인다",true,"심장에 부담을 줍니다."],
+["염분 섭취는 하루 10g 이상이 권장된다",false,"WHO 권고는 5g 이하입니다."],
+["걷기 운동은 혈압 관리에 도움이 된다",true,"가장 안전한 유산소 운동입니다."],
+["고혈압은 노인만 걸린다",false,"젊은 층도 증가하고 있습니다."],
+["술은 혈압을 낮춘다",false,"과음은 혈압을 상승시킵니다."],
+["고혈압은 신장 질환을 유발할 수 있다",true,"신장 혈관이 손상됩니다."],
+["혈압은 한 번만 재도 정확하다",false,"여러 번 측정해야 정확합니다."],
+["규칙적인 수면은 혈압에 도움 된다",true,"수면 부족은 혈압 상승 요인입니다."],
+["고혈압은 완치가 불가능하다",true,"관리로 조절하는 질환입니다."],
+["채소 섭취는 혈압 관리에 도움 된다",true,"칼륨 섭취가 중요합니다."],
 
-["카페인은 혈압을 일시적으로 올릴 수 있다",true,"특히 카페인 민감자에게 영향이 큽니다."],
-["고혈압은 노인에게만 발생한다",false,"젊은 층에서도 증가 중입니다."],
-["심박수와 혈압은 항상 비례한다",false,"항상 같은 것은 아닙니다."],
-["고혈압은 실명 위험을 높일 수 있다",true,"망막병증과 관련됩니다."],
-["염분 섭취 제한은 혈압을 낮춘다",true,"WHO에서도 권장합니다."],
-["운동은 고혈압 치료에 효과가 없다",false,"가장 중요한 비약물 치료입니다."],
-["복부 비만은 고혈압 위험을 높인다",true,"내장지방이 문제입니다."],
-["혈압약은 갑자기 중단해도 괜찮다",false,"반동성 혈압 상승 위험이 있습니다."],
-["고혈압은 대표적인 생활습관병이다",true,"식습관·운동과 밀접합니다."],
-["혈압은 양팔 모두 재는 것이 좋다",true,"차이가 있는지 확인해야 합니다."]
+["소금 대신 허브 사용은 혈압에 좋다",true,"나트륨 섭취를 줄입니다."],
+["고혈압은 유전과 무관하다",false,"가족력이 영향을 줍니다."],
+["혈압약은 평생 먹을 수도 있다",true,"상태에 따라 장기 복용이 필요합니다."],
+["체중 감량은 혈압을 낮춘다",true,"체중 감소 효과가 큽니다."],
+["탄산음료는 혈압에 영향 없다",false,"당분과 나트륨이 문제됩니다."],
+["고혈압은 실명 위험도 높인다",true,"망막 혈관 손상이 발생합니다."],
+["혈압이 높아도 운동하면 안 된다",false,"의사 상담 후 운동이 권장됩니다."],
+["가공식품은 고혈압에 불리하다",true,"나트륨 함량이 높습니다."],
+["칼륨은 혈압을 낮추는 역할을 한다",true,"나트륨 배출을 돕습니다."],
+["고혈압은 생활습관 개선이 중요하다",true,"약물과 함께 필수입니다."]
 ];
 
 let currentQuiz = [];
 
 function showQuiz(){
   currentQuiz = QUIZ.sort(()=>Math.random()-0.5).slice(0,10);
-  let html = `<div class="card"><h2>O / X 퀴즈 (10문제)</h2>`;
+  let html = `<div class="card"><h2>고혈압 O / X 퀴즈</h2>`;
+
   currentQuiz.forEach((q,i)=>{
     html += `
     <p>${i+1}. ${q[0]}</p>
     <label><input type="radio" name="q${i}" value="true"> O</label>
-    <label><input type="radio" name="q${i}" value="false"> X</label>`;
+    <label><input type="radio" name="q${i}" value="false"> X</label>
+    `;
   });
-  html += `<br><br><button onclick="grade()">채점</button></div>`;
+
+  html += `<br><button onclick="grade()">채점하기</button></div>`;
   document.getElementById("content").innerHTML = html;
 }
 
 function grade(){
   let score = 0;
-  let html = `<div class="card"><h2>퀴즈 결과</h2>`;
+  let html = `<div class="card"><h2>결과</h2>`;
+
   currentQuiz.forEach((q,i)=>{
-    const sel = document.querySelector(\`input[name="q${i}"]:checked\`);
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
     const ok = sel && (sel.value==="true")===q[1];
     if(ok) score++;
+
     html += `
     <p class="${ok?'correct':'wrong'}">
       ${i+1}. ${ok?'정답':'오답'}
-      <button onclick="alert('${q[2]}')">설명</button>
+      <button onclick="alert('${q[2]}')">해설</button>
     </p>`;
   });
+
   html += `<h3>점수: ${score}/10</h3></div>`;
   document.getElementById("content").innerHTML = html;
 }
@@ -161,4 +167,3 @@ function grade(){
 
 </body>
 </html>
-
