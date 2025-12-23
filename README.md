@@ -11,12 +11,6 @@ body {
   font-family:sans-serif;
   padding:20px;
   font-size:18px;
-  transition:0.2s;
-}
-
-/* ✅ 큰 글씨 모드 */
-body.big {
-  font-size:30px;
 }
 
 h1,h2 { text-align:center; }
@@ -24,12 +18,12 @@ h1,h2 { text-align:center; }
 button {
   padding:14px;
   margin:8px;
-  font-size:1.2em;
+  font-size:1.1em;
   cursor:pointer;
 }
 
 input {
-  font-size:1.2em;
+  font-size:1.1em;
   padding:6px;
   margin:6px;
 }
@@ -39,6 +33,7 @@ input {
   padding:16px;
   margin-top:16px;
 }
+
 .correct { color:#22c55e; }
 .wrong { color:#ef4444; }
 </style>
@@ -51,17 +46,11 @@ input {
 <div class="card" style="text-align:center">
   <button onclick="showBP()">혈압 측정</button>
   <button onclick="showQuiz()">고혈압 퀴즈</button>
-  <button onclick="toggleBig()">큰 글씨 모드</button>
 </div>
 
 <div id="content"></div>
 
 <script>
-/* ================= 공통 ================= */
-function toggleBig(){
-  document.body.classList.toggle("big");
-}
-
 /* ================= 혈압 ================= */
 function classify(sp, dp){
   if(sp>=180||dp>=120) return "고혈압 위기";
@@ -93,35 +82,55 @@ function calcBP(){
 
   const r = classify(sp,dp);
 
-  /* 결과 저장 */
-  const log = JSON.parse(localStorage.getItem("bpLog") || "[]");
-  log.push({date:new Date().toLocaleString(), sp, dp, r});
-  localStorage.setItem("bpLog", JSON.stringify(log));
-
   document.getElementById("bpResult").innerHTML = `
     <p><b>판정:</b> ${r}</p>
-    <p>결과가 저장되었습니다.</p>
     ${r!=="정상 혈압"
-      ? `<a href="https://www.kdca.go.kr" target="_blank">의료 정보 보기</a>`
+      ? `<a href="https://www.kdca.go.kr" target="_blank">질병관리청 고혈압 정보 보기</a>`
       : ""}`;
 }
 
 /* ================= 퀴즈 ================= */
+/* 총 30문제 */
 const QUIZ = [
-["혈압약은 의사 지시 없이 중단하면 안 된다",true,"갑작스러운 중단은 위험합니다."],
-["고혈압은 증상이 없어도 위험하다",true,"장기 손상이 진행될 수 있습니다."],
-["저염식은 혈압 관리에 도움 된다",true,"나트륨 섭취를 줄이세요."],
-["혈압은 한 번만 재면 충분하다",false,"여러 번 재야 정확합니다."],
-["운동은 혈압을 낮출 수 있다",true,"걷기 같은 유산소 운동이 좋습니다."],
-["흡연은 혈압에 영향이 없다",false,"혈관을 수축시킵니다."],
-["스트레스 관리도 중요하다",true,"혈압 상승 요인입니다."]
+["고혈압은 장기간 방치하면 신장 기능을 저하시킬 수 있다",true,"고혈압은 신장 혈관을 손상시킵니다."],
+["혈압은 측정할 때 다리를 꼬아도 된다",false,"다리를 꼬면 혈압이 높게 나올 수 있습니다."],
+["고혈압은 심부전 발생 위험을 증가시킨다",true,"심장이 과도한 압력을 받습니다."],
+["아침 고혈압은 심혈관 질환 위험이 높다",true,"아침 혈압 상승이 특히 위험합니다."],
+["혈압약은 증상이 있을 때만 복용한다",false,"증상이 없어도 꾸준히 복용해야 합니다."],
+["짠 음식을 먹으면 체내 수분량이 증가한다",true,"나트륨은 수분을 붙잡습니다."],
+["고혈압은 뇌출혈 위험을 증가시킨다",true,"혈관 파열 위험이 커집니다."],
+["운동 직후 혈압을 재면 정확하다",false,"안정 후 측정해야 합니다."],
+["고혈압은 동맥경화를 촉진한다",true,"혈관 벽 손상을 유발합니다."],
+["칼륨 섭취는 혈압 조절에 도움을 준다",true,"나트륨 배출을 촉진합니다."],
+
+["스트레스는 혈압 상승 요인이다",true,"교감신경이 활성화됩니다."],
+["혈압은 겨울보다 여름에 더 높다",false,"추운 계절에 혈압이 더 높습니다."],
+["고혈압은 시력 저하를 유발할 수 있다",true,"망막 혈관 손상 때문입니다."],
+["체중 감소는 혈압을 낮출 수 있다",true,"비만은 주요 위험 요인입니다."],
+["술은 소량이라도 혈압에 영향이 없다",false,"알코올은 혈압을 상승시킵니다."],
+["고혈압은 가족력이 중요하다",true,"유전적 요인이 큽니다."],
+["혈압 측정 전 5분 휴식이 필요하다",true,"안정 상태가 중요합니다."],
+["고혈압은 심근경색 위험을 낮춘다",false,"오히려 위험을 증가시킵니다."],
+["식이섬유는 혈압 관리에 도움된다",true,"혈관 건강을 개선합니다."],
+["고혈압 전단계는 치료가 필요 없다",false,"생활습관 관리가 필요합니다."],
+
+["카페인은 혈압을 일시적으로 올릴 수 있다",true,"특히 카페인 민감자에게 영향이 큽니다."],
+["고혈압은 노인에게만 발생한다",false,"젊은 층에서도 증가 중입니다."],
+["심박수와 혈압은 항상 비례한다",false,"항상 같은 것은 아닙니다."],
+["고혈압은 실명 위험을 높일 수 있다",true,"망막병증과 관련됩니다."],
+["염분 섭취 제한은 혈압을 낮춘다",true,"WHO에서도 권장합니다."],
+["운동은 고혈압 치료에 효과가 없다",false,"가장 중요한 비약물 치료입니다."],
+["복부 비만은 고혈압 위험을 높인다",true,"내장지방이 문제입니다."],
+["혈압약은 갑자기 중단해도 괜찮다",false,"반동성 혈압 상승 위험이 있습니다."],
+["고혈압은 대표적인 생활습관병이다",true,"식습관·운동과 밀접합니다."],
+["혈압은 양팔 모두 재는 것이 좋다",true,"차이가 있는지 확인해야 합니다."]
 ];
 
 let currentQuiz = [];
 
 function showQuiz(){
-  currentQuiz = QUIZ.sort(()=>Math.random()-0.5).slice(0,6);
-  let html = `<div class="card"><h2>O / X 퀴즈</h2>`;
+  currentQuiz = QUIZ.sort(()=>Math.random()-0.5).slice(0,10);
+  let html = `<div class="card"><h2>O / X 퀴즈 (10문제)</h2>`;
   currentQuiz.forEach((q,i)=>{
     html += `
     <p>${i+1}. ${q[0]}</p>
@@ -136,7 +145,7 @@ function grade(){
   let score = 0;
   let html = `<div class="card"><h2>퀴즈 결과</h2>`;
   currentQuiz.forEach((q,i)=>{
-    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    const sel = document.querySelector(\`input[name="q${i}"]:checked\`);
     const ok = sel && (sel.value==="true")===q[1];
     if(ok) score++;
     html += `
@@ -145,11 +154,10 @@ function grade(){
       <button onclick="alert('${q[2]}')">설명</button>
     </p>`;
   });
-  html += `<h3>점수: ${score}/${currentQuiz.length}</h3></div>`;
+  html += `<h3>점수: ${score}/10</h3></div>`;
   document.getElementById("content").innerHTML = html;
 }
 </script>
 
 </body>
 </html>
-
