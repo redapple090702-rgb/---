@@ -75,7 +75,7 @@ def blood_pressure_mode():
     big_print("결과가 저장되었습니다")
 
     if result in ["1기 고혈압", "2기 고혈압", "고혈압 위기"]:
-        big_print("의료 정보 사이트로 이동합니다")
+        big_print("질병관리청 사이트로 이동합니다")
         webbrowser.open("https://www.kdca.go.kr")
 
 # =========================
@@ -144,4 +144,6 @@ def main():
         else:
             print("잘못된 선택입니다")
 
-main()
+if __name__ == "__main__":
+    main()
+
