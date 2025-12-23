@@ -7,7 +7,6 @@
 <style>
 body{
   font-family: Arial, sans-serif;
-  font-size: 26px;   /* 전체 기본 폰트 크게 */
   background:#f4f6f8;
   padding:20px;
 }
@@ -15,30 +14,27 @@ body{
 h1{text-align:center;}
 
 button{
-  font-size:24px;
-  padding:12px 20px;
-  margin:8px;
+  padding:10px 16px;
+  margin:6px;
   cursor:pointer;
 }
 
 input{
-  font-size:24px;
-  padding:8px;
-  width:150px;
+  padding:6px;
+  width:140px;
 }
 
 .card{
   background:white;
-  padding:25px;
-  border-radius:12px;
+  padding:20px;
+  border-radius:10px;
   margin:20px auto;
   max-width:700px;
   box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
 .explain{
-  margin-top:8px;
-  font-size:22px;
+  margin-top:6px;
 }
 
 .correct{color:green;}
@@ -58,6 +54,7 @@ input{
 <div id="content"></div>
 
 <script>
+// ================= 혈압 측정 =================
 function classify(sp, dp){
   if(sp>=180||dp>=120) return "고혈압 위기";
   if(sp>=160||dp>=100) return "2기 고혈압";
@@ -73,52 +70,70 @@ function showBP(){
     수축기(mmHg) <input id="sp" type="number"><br><br>
     확장기(mmHg) <input id="dp" type="number"><br><br>
     <button onclick="calc()">측정</button>
-    <div id="result" style="margin-top:15px;"></div>
+    <div id="result" style="margin-top:10px;"></div>
   </div>`;
 }
 
 function calc(){
-  const spVal = document.getElementById("sp").value;
-  const dpVal = document.getElementById("dp").value;
+  const sp = document.getElementById("sp").value;
+  const dp = document.getElementById("dp").value;
 
-  if(spVal === "" || dpVal === ""){
+  if(sp==="" || dp===""){
     document.getElementById("result").innerHTML =
-      "<b>⚠ 숫자를 모두 입력하세요.</b>";
+      "<b>숫자를 모두 입력하세요.</b>";
     return;
   }
 
-  const sp = Number(spVal);
-  const dp = Number(dpVal);
-  const r = classify(sp,dp);
-
+  const result = classify(Number(sp), Number(dp));
   let link = "";
-  if(r !== "정상 혈압"){
+
+  if(result !== "정상 혈압"){
     link = `
-    <p style="margin-top:10px;">
+    <p>
       🔗 <a href="https://www.kdca.go.kr" target="_blank">
-      질병관리청 고혈압 정보 보기
+      질병관리청 고혈압 정보
       </a>
     </p>`;
   }
 
   document.getElementById("result").innerHTML = `
-    <p>판정 결과: <b>${r}</b></p>
+    <p>판정 결과: <b>${result}</b></p>
     ${link}
   `;
 }
 
-/* 퀴즈 풀은 이전과 동일 */
+// ================= 퀴즈 =================
 const quizPool = [
- ["혈압약은 증상이 없어도 계속 복용해야 한다", true, "무증상 고혈압도 합병증 위험이 큽니다."],
- ["고혈압은 뇌졸중 위험을 높인다", true, "가장 큰 위험 요인 중 하나입니다."],
- ["저염식은 혈압 관리에 효과가 있다", true, "나트륨 섭취 감소는 혈압을 낮춥니다."],
- ["운동은 혈압을 일시적으로만 낮춘다", false, "꾸준한 운동은 장기적 효과가 있습니다."],
- ["고혈압은 유전과 무관하다", false, "가족력도 중요한 요인입니다."],
- ["수면 부족은 혈압에 영향을 준다", true, "교감신경 활성과 관련됩니다."],
- ["흡연은 혈압에 영향을 주지 않는다", false, "혈관을 수축시킵니다."],
- ["칼륨 섭취는 혈압 조절에 도움된다", true, "나트륨 배출을 돕습니다."],
- ["고혈압 전단계는 치료가 필요 없다", false, "생활습관 관리가 필요합니다."],
- ["혈압 측정 전 휴식이 필요하다", true, "정확도를 높입니다."]
+ ["혈압약은 증상이 없어도 복용해야 한다", true, "무증상 고혈압도 합병증 위험이 큽니다."],
+ ["고혈압은 뇌졸중 위험을 높인다", true, "주요 위험 인자입니다."],
+ ["저염식은 혈압 관리에 중요하다", true, "나트륨 섭취 감소 효과"],
+ ["운동은 혈압에 장기적 효과가 없다", false, "꾸준한 운동은 지속 효과"],
+ ["고혈압은 유전과 무관하다", false, "가족력 영향 있음"],
+ ["수면 부족은 혈압을 올릴 수 있다", true, "교감신경 활성"],
+ ["흡연은 혈압과 무관하다", false, "혈관 수축 유발"],
+ ["칼륨 섭취는 혈압에 도움된다", true, "나트륨 배출 도움"],
+ ["고혈압 전단계는 관리가 필요 없다", false, "생활습관 개선 필요"],
+ ["혈압은 안정 후 측정해야 정확하다", true, "오차 감소"],
+ ["스트레스는 혈압을 높일 수 있다", true, "호르몬 영향"],
+ ["체중 감량은 혈압을 낮출 수 있다", true, "말초 저항 감소"],
+ ["고혈압은 심장에 부담을 준다", true, "심부전 위험"],
+ ["고혈압 위기는 응급상황이다", true, "즉각적 치료 필요"],
+ ["카페인은 혈압에 영향이 없다", false, "일시적 상승"],
+ ["염분 섭취량과 혈압은 관련 있다", true, "상관관계 명확"],
+ ["혈압은 하루 중 변하지 않는다", false, "변동성 큼"],
+ ["운동 직후 혈압은 항상 낮다", false, "일시적 상승 가능"],
+ ["고혈압은 신장 기능에 영향을 준다", true, "신장 손상 위험"],
+ ["과도한 음주는 혈압을 높인다", true, "혈관 조절 장애"],
+ ["고혈압은 동맥경화 위험을 높인다", true, "혈관 손상"],
+ ["야채 섭취는 혈압 관리에 도움된다", true, "미네랄 풍부"],
+ ["혈압약은 평생 먹어야만 한다", false, "상태에 따라 조절"],
+ ["고혈압은 시력에도 영향을 준다", true, "망막 손상 가능"],
+ ["운동은 심박수만 높인다", false, "혈관 기능 개선"],
+ ["혈압은 양팔에서 같아야 한다", false, "차이 발생 가능"],
+ ["고혈압은 치매 위험을 높인다", true, "혈관성 치매"],
+ ["소금은 전혀 섭취하면 안 된다", false, "적정량 필요"],
+ ["혈압은 집에서도 측정 가능하다", true, "가정 혈압 중요"],
+ ["고혈압은 관리하면 합병증 줄일 수 있다", true, "조절 가능"]
 ];
 
 function showQuiz(){
