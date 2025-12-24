@@ -132,6 +132,7 @@ function checkBP(){
 
   document.getElementById("bpResult").innerText = result;
 }
+  
 function kdcaLink(){
   return `
     <p>
