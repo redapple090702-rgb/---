@@ -132,16 +132,7 @@ function checkBP(){
 
   document.getElementById("bpResult").innerText = result;
 }
-  
-function kdcaLink(){
-  return `
-    <p>
-      🔗 <a href="https://www.kdca.go.kr" target="_blank">
-      질병관리청 고혈압 정보 바로가기
-      </a>
-    </p>
-  `;
-}
+
 /* 퀴즈 */
 const QUIZ = [
 ["혈압이 높아도 증상이 없을 수 있다",true,"초기 고혈압은 무증상인 경우가 많습니다."],
