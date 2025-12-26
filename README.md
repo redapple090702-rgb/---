@@ -46,7 +46,7 @@
 function checkAnswers() {
   // 정답 설정
   const correct1 = "수급권자";
-  const correct2 = "본인부담금";
+  const correct2 = "경상의료비";
 
   // 사용자 입력
   const user1 = document.getElementById("answer1").value.trim();
